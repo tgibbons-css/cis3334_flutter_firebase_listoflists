@@ -1,6 +1,9 @@
 
 class ShoppingList {
-  String storeName;
+  String listName;
+
+  ShoppingList(this.listName);
+
   List <ShoppingItem> listItems;
 
   ShoppingItem addItem(String itemName, int quantity) {

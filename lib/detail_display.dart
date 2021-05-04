@@ -19,7 +19,7 @@ class _DetailDisplayState extends State<DetailDisplay> {
 
   String userID;
   String itemID;
-  ShoppingItem item;
+  ShoppingList shoppingList;
   CollectionReference itemCollectionDB;
   final TextEditingController _newItemNameTextField = TextEditingController();
   final TextEditingController _newItemQuantityTextField = TextEditingController();
@@ -35,8 +35,9 @@ class _DetailDisplayState extends State<DetailDisplay> {
     //        |
     //        |--> userID -- ITEMS_WITH_DETAILS|--> itemID -- DETAILS
     //        |                                |--> itemID -- DETAILS
-    itemCollectionDB = FirebaseFirestore.instance.collection('USERS').doc(userID).collection('ITEMS_WITH_DETAILS').doc(itemID).collection('DETAILS');
-
+    //itemCollectionDB = FirebaseFirestore.instance.collection('USERS').doc(userID).collection('ITEMS_WITH_DETAILS').doc(itemID).collection('DETAILS');
+    itemCollectionDB = FirebaseFirestore.instance.collection('USERS').doc(userID).collection('TEST_ITEMS');
+    //shoppingList = snapshot.data.docs[position]
   }
 
   Widget nameTextFieldWidget() {
@@ -72,8 +73,10 @@ class _DetailDisplayState extends State<DetailDisplay> {
           onPressed: () async {
             String name = _newItemNameTextField.text.toString();
             int quanity = int.parse(_newItemQuantityTextField.text.toString());
-            item = new ShoppingItem(name, quanity );
-            await itemCollectionDB.add({'ShoppingItem': item});
+            ShoppingItem item = new ShoppingItem(name, quanity );
+
+            // TODO update shoppinglist in FireStore
+            //await itemCollectionDB.add({'ShoppingItem': item});
             _newItemNameTextField.clear();
             _newItemQuantityTextField.clear();
           },

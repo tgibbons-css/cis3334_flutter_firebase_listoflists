@@ -6,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import 'authentication.dart';
 import 'detail_display.dart';
+import 'shopping_item.dart';
 
 //void main() {
 //  runApp(MyApp());
@@ -61,10 +62,9 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
     return SizedBox(
       child: ElevatedButton(
           onPressed: () async {
-            String itemName = _newItemTextField.text;
-            await itemCollectionDB.add({'item_name': itemName});
-            // create the collection for the shopping items
-            FirebaseFirestore.instance.collection('USERS').doc(userID).collection('ITEMS_WITH_DETAILS').doc(itemName).collection('ShoppingItem');
+            String listName = _newItemTextField.text;
+            ShoppingList shoppingList = new ShoppingList(listName);
+            await itemCollectionDB.add({'ShoppingList': shoppingList});
             _newItemTextField.clear();
           },
           child: Text(
@@ -87,20 +87,21 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
   }
 
   Widget itemTileWidget(snapshot, position) {
+    ShoppingList shoppingList = snapshot.data.docs[position]['ShoppingList'];
     return ListTile(
       leading: Icon(Icons.check_box),
-      title: Text(snapshot.data.docs[position]['item_name']),
+      title: Text(shoppingList.listName),
       onTap: () {
         setState(() {
           print("You tapped at postion =  $position");
-          String itemId = snapshot.data.docs[position].id;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailDisplay(itemID: itemId,)));
+          String listId = snapshot.data.docs[position].id;
+          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailDisplay(itemID: listId,)));
         });
       },
       onLongPress: () {
         print("You long pressed at postion =  $position");
-        String itemId = snapshot.data.docs[position].id;
-        itemCollectionDB.doc(itemId).delete();
+        String listId = snapshot.data.docs[position].id;
+        itemCollectionDB.doc(listId).delete();
       },
     );
   }
