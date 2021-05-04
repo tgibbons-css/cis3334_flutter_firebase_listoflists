@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';        // for Firebase Authen
 import 'package:cloud_firestore/cloud_firestore.dart';    // for Firebase Firestore
 import 'package:google_sign_in/google_sign_in.dart';
 
+import 'dart:convert';
+
 import 'authentication.dart';
 import 'detail_display.dart';
 import 'shopping_item.dart';
@@ -64,7 +66,7 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
           onPressed: () async {
             String listName = _newItemTextField.text;
             ShoppingList shoppingList = new ShoppingList(listName);
-            await itemCollectionDB.add({'ShoppingList': shoppingList});
+            await itemCollectionDB.add({'ShoppingList': shoppingList.toJson()});
             _newItemTextField.clear();
           },
           child: Text(
@@ -87,7 +89,10 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
   }
 
   Widget itemTileWidget(snapshot, position) {
-    ShoppingList shoppingList = snapshot.data.docs[position]['ShoppingList'];
+    String jsonShoppingList = snapshot.data.docs[position]['ShoppingList'];
+    Map<String, dynamic> shoppingListMap = jsonDecode(jsonShoppingList);
+
+    ShoppingList shoppingList = ShoppingList.fromJson(shoppingListMap);
     return ListTile(
       leading: Icon(Icons.check_box),
       title: Text(shoppingList.listName),
