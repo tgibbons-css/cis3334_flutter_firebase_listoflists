@@ -8,7 +8,9 @@ import 'dart:convert';
 
 import 'authentication.dart';
 import 'detail_display.dart';
-import 'shopping_item.dart';
+//import 'shopping_item.dart';
+import 'shopping_list.dart';
+
 
 //void main() {
 //  runApp(MyApp());
@@ -40,7 +42,9 @@ class FirebaseDemo extends StatefulWidget {
 
 class _FirebaseDemoState extends State<FirebaseDemo> {
   final TextEditingController _newItemTextField = TextEditingController();
-  CollectionReference itemCollectionDB = FirebaseFirestore.instance.collection('ITEMS');
+  //CollectionReference itemCollectionDB = FirebaseFirestore.instance.collection('TEST_ITEMS');
+  CollectionReference itemCollectionDB;
+
   String userID;       //  Added for Firebase Authentication
 
   //List<String> itemList = [];
@@ -65,7 +69,8 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
       child: ElevatedButton(
           onPressed: () async {
             String listName = _newItemTextField.text;
-            ShoppingList shoppingList = new ShoppingList(listName);
+            ShoppingList shoppingList = new ShoppingList(listName: listName, listItems: <ListItem>[] );
+            print ("addButton with ${shoppingList.toJson()}");
             await itemCollectionDB.add({'ShoppingList': shoppingList.toJson()});
             _newItemTextField.clear();
           },
@@ -89,22 +94,20 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
   }
 
   Widget itemTileWidget(snapshot, position) {
-    String jsonShoppingList = snapshot.data.docs[position]['ShoppingList'];
-    Map<String, dynamic> shoppingListMap = jsonDecode(jsonShoppingList);
-
+    Map<String, dynamic> shoppingListMap = snapshot.data.docs[position]['ShoppingList'];
     ShoppingList shoppingList = ShoppingList.fromJson(shoppingListMap);
     return ListTile(
       leading: Icon(Icons.check_box),
       title: Text(shoppingList.listName),
       onTap: () {
         setState(() {
-          print("You tapped at postion =  $position");
-          String listId = snapshot.data.docs[position].id;
-          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailDisplay(itemID: listId,)));
+          // on tap go to the detail display screen
+          String listID = snapshot.data.docs[position].id;
+          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailDisplay(listID: listID,)));
         });
       },
       onLongPress: () {
-        print("You long pressed at postion =  $position");
+        // on long press delete this list
         String listId = snapshot.data.docs[position].id;
         itemCollectionDB.doc(listId).delete();
       },
@@ -174,12 +177,9 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
             ElevatedButton(
                 onPressed: ()
                 async {
-                  //setState(() async {
                   // do authenication
                   await authStuff.signInWithGoogle();
                   userID = authStuff.getUserID();
-                  print ("Button onPressed DONE");
-                  // });
                 },
                 child: Text(
                   'Log in with Google',
@@ -201,7 +201,7 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
         if(snapshot.hasData) {
           print("Main builder -- User exists");
           userID = FirebaseAuth.instance.currentUser.uid;
-          itemCollectionDB = FirebaseFirestore.instance.collection('USERS').doc(userID).collection('TEST_ITEMS');
+          itemCollectionDB = FirebaseFirestore.instance.collection('USERS').doc(userID).collection('SHOPPING_LISTS_2');
           return mainScreen();
         }
         else {
