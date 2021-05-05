@@ -8,13 +8,8 @@ import 'dart:convert';
 
 import 'authentication.dart';
 import 'detail_display.dart';
-//import 'shopping_item.dart';
 import 'shopping_list.dart';
 
-
-//void main() {
-//  runApp(MyApp());
-//}
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -119,14 +114,18 @@ class _FirebaseDemoState extends State<FirebaseDemo> {
         child:
         StreamBuilder(stream: itemCollectionDB.snapshots(),
             builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              return ListView.builder(
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (BuildContext context, int position) {
-                    return Card(
-                        child: itemTileWidget(snapshot,position)
-                    );
-                  }
-              );
+              if (snapshot.hasData) {             // initially we won't have the Firestore data.  Only display the list once the async call returns data
+                return ListView.builder(
+                    itemCount: snapshot.data.docs.length,
+                    itemBuilder: (BuildContext context, int position) {
+                      return Card(
+                          child: itemTileWidget(snapshot,position)
+                      );
+                    }
+                );
+              } else {
+                return Text("Getting data from the cloud");
+              }
             })
     );
   }

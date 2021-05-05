@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';        // for Firebase Authentication
 import 'package:cloud_firestore/cloud_firestore.dart';    // for Firebase Firestore
 
-//import 'shopping_item.dart';
 import 'shopping_list.dart';
 
 class DetailDisplay extends StatefulWidget {
